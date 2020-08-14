@@ -1,19 +1,29 @@
 <template>
     <div class="container pt-5">
         <br /><br /><br />
+        {{ this.success }}
         <div class="card p-5">
             <h4>Email Our Mailing List</h4>
             <small class="pb-3"
-                >Sending bulk email to our mailing list contacts</small
+                >Sending bulk email to our mailing list contacts using Twilio
+                SendGrid</small
             >
             <form v-on:submit.prevent="send">
                 <div class="form-group">
-                    <!-- <input
+                    <input
+                        type="text"
+                        class="form-control"
+                        placeholder="Topic"
+                        v-model="data.emailTopic"
+                    />
+                </div>
+                <div class="form-group">
+                    <input
                         type="email"
                         class="form-control"
-                        placeholder="Enter email address seperated with corma"
-                        v-model=""
-                    /> -->
+                        placeholder="Sender Email"
+                        v-model="data.senderEmail"
+                    />
                 </div>
                 <div class="form-group">
                     <textarea
@@ -26,7 +36,7 @@
                     Send Emails
                 </button>
             </form>
-            <div class="pt-3 btn-outline-danger">
+            <div class="pt-3 danger">
                 {{ this.error }}
             </div>
         </div>
@@ -39,16 +49,20 @@ export default {
     data() {
         return {
             data: {},
-            error: ""
+            error: "",
+            success: ""
         };
     },
 
     methods: {
         send() {
             if (this.data.emailBody != "") {
-                axios.post("api/email/send", this.data);
+                axios.post("api/email/send", this.data).then(res => {
+                    this.success = "Emails sent successfully";
+                });
+            } else {
+                this.error = "This field is required";
             }
-            this.error = "This field is required";
         }
     }
 };

@@ -3,52 +3,50 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\EmailListing;
+use SendGrid;
 
 class EmailListingController extends Controller
 {
     public function sendEMail(Request $request)
     {
-        return response()->json('testing');
-        // $validated = $request->validate([
-        //     'from' => 'required|email',
-        //     'users' => 'required|array',
-        //     'users.*' => 'required',
-        //     'subject' => 'required|string',
-        //     'body' => 'required|string',
-        // ]);
+        $validated = $request->validate([
+            'emailTopic' => 'required|string',
+            'emailBody' => 'required|string',
+            'senderEmail' => 'required|email',
+        ]);
 
-        // $from = new \SendGrid\Mail\From($validated['from']);
+        $from = new \SendGrid\Mail\From($validated['senderEmail']);
 
-        // /* Add selected users email to $tos array */
-        // $tos = [];
-        // foreach ($validated['users'] as $user) {
-        //     array_push($tos, new \SendGrid\Mail\To(json_decode($user)->email, json_decode($user)->name));
-        // }
+        /* Add email array from db to the mailing list */
+        $receivers = EmailListing::all();
 
-        // /* Sent subject of mail */
-        // $subject = new \SendGrid\Mail\Subject($validated['subject']);
+        /* Sent subject of mail */
+        $subject = new \SendGrid\Mail\Subject($validated['emailTopic']);
 
-        // /* Set mail body */
-        // $htmlContent = new \SendGrid\Mail\HtmlContent($validated['body']);
+        /* Set mail body */
+        $htmlContent = new \SendGrid\Mail\HtmlContent($validated['emailBody']);
 
-        // $email = new \SendGrid\Mail\Mail(
-        //     $from,
-        //     $tos,
-        //     $subject,
-        //     null,
-        //     $htmlContent
-        // );
+        $email = new \SendGrid\Mail\Mail(
+            $from,
+            $receivers,
+            $subject,
+            null,
+            $htmlContent
+        );
 
-        // /* Create instance of Sendgrid SDK */
-        // $sendgrid = new SendGrid(getenv('SENDGRID_API_KEY'));
+        return response()->json($mail);
 
-        // /* Send mail using sendgrid instance */
-        // $response = $sendgrid->send($email);
-        // if ($response->statusCode() == 202) {
-        //     return back()->with(['success' => "E-mails successfully sent out!!"]);
-        // }
+        /* Create instance of Sendgrid SDK */
+        $sendgrid = new SendGrid(getenv('SENDGRID_API_KEY'));
 
-        // return back()->withErrors(json_decode($response->body())->errors);
+        /* Send mail using sendgrid instance */
+        $response = $sendgrid->send($email);
+        if ($response->statusCode() == 202) {
+            return back()->with(['success' => "E-mails successfully sent out!!"]);
+        }
+
+        return back()->withErrors(json_decode($response->body())->errors);
     }
 
 }

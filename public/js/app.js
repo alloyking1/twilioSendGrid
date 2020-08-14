@@ -1945,21 +1945,36 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       data: {},
-      error: ""
+      error: "",
+      success: ""
     };
   },
   methods: {
     send: function send() {
-      if (this.data.emailBody != "") {
-        axios__WEBPACK_IMPORTED_MODULE_0___default.a.post("api/email/send", this.data);
-      }
+      var _this = this;
 
-      this.error = "This field is required";
+      if (this.data.emailBody != "") {
+        axios__WEBPACK_IMPORTED_MODULE_0___default.a.post("api/email/send", this.data).then(function (res) {
+          _this.success = "Emails sent successfully";
+        });
+      } else {
+        this.error = "This field is required";
+      }
     }
   }
 });
@@ -19618,12 +19633,14 @@ var render = function() {
     _c("br"),
     _c("br"),
     _c("br"),
-    _vm._v(" "),
+    _vm._v("\n    " + _vm._s(this.success) + "\n    "),
     _c("div", { staticClass: "card p-5" }, [
       _c("h4", [_vm._v("Email Our Mailing List")]),
       _vm._v(" "),
       _c("small", { staticClass: "pb-3" }, [
-        _vm._v("Sending bulk email to our mailing list contacts")
+        _vm._v(
+          "Sending bulk email to our mailing list contacts using Twilio\n            SendGrid"
+        )
       ]),
       _vm._v(" "),
       _c(
@@ -19637,7 +19654,53 @@ var render = function() {
           }
         },
         [
-          _c("div", { staticClass: "form-group" }),
+          _c("div", { staticClass: "form-group" }, [
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.data.emailTopic,
+                  expression: "data.emailTopic"
+                }
+              ],
+              staticClass: "form-control",
+              attrs: { type: "text", placeholder: "Topic" },
+              domProps: { value: _vm.data.emailTopic },
+              on: {
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.$set(_vm.data, "emailTopic", $event.target.value)
+                }
+              }
+            })
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "form-group" }, [
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.data.senderEmail,
+                  expression: "data.senderEmail"
+                }
+              ],
+              staticClass: "form-control",
+              attrs: { type: "email", placeholder: "Sender Email" },
+              domProps: { value: _vm.data.senderEmail },
+              on: {
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.$set(_vm.data, "senderEmail", $event.target.value)
+                }
+              }
+            })
+          ]),
           _vm._v(" "),
           _c("div", { staticClass: "form-group" }, [
             _c("textarea", {
@@ -19674,7 +19737,7 @@ var render = function() {
         ]
       ),
       _vm._v(" "),
-      _c("div", { staticClass: "pt-3 btn-outline-danger" }, [
+      _c("div", { staticClass: "pt-3 danger" }, [
         _vm._v("\n            " + _vm._s(this.error) + "\n        ")
       ])
     ])
