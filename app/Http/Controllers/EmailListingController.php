@@ -23,24 +23,43 @@ class EmailListingController extends Controller
         $receivers = [];
         $emailContent = $validated['emailBody'];
 
-        foreach($addresses as $address){
-            $receivers2 = [$address->email => "this is a test"];
-            // $receivers[] = $receivers2;
-        }
+        
 
-        // return $receivers;
+        foreach($addresses as $address){
+            if(count($receivers) === 0){
+                $receivers = [$address->email => "this is the first"];
+            }else{
+                array_push($receivers, $address->email);
+            }
+            // $receivers[] = $receivers2;
+            // array_push($receivers, [$address->email=>"this is a test"]);
+            // $receivers = array($address->email=>"this is a test");
+        }
+        // $sum = 0;
+        // do{
+        //     $sum ++;
+        //     array_push($receivers, [$addresses->email => "this is a test"]);
+        // }while ($sum < count($addresses));
+
+        print_r($receivers);
+        return $receivers;
 
         // $tos = [
         //         "alloyking1@gmail.com" => "Example User1",
         //         "alloyking1@yahoo.com" => "Example User2",
         //     ];
+
+        // return $receivers;
+        // return $tos;
+
+        
             
 
         $email = new \SendGrid\Mail\Mail();
         $email->setFrom($from, "alloy");
         $email->setSubject($topic);
-        // $email->addTo("alloyking1@gmail.com", "Example User");
-        $email->addTos($receivers2);
+        $email->addTo("alloyking1@gmail.com", "Example User");
+        $email->addTos($receivers);
         $email->addContent("text/plain", $emailContent);
         
         $sendgrid = new \SendGrid(getenv('SENDGRID_API_KEY'));
@@ -53,60 +72,6 @@ class EmailListingController extends Controller
             return response()->json( 'Caught exception: '. $e->getMessage() ."\n");
         }
 
-
-
-
-
-
-
-
-        $from = new \SendGrid\Mail\From($validated['senderEmail']);
-
-        /* Add email array from db to the mailing list */
-        $receivers = EmailListing::all();
-        foreach ($receivers as $key){
-
-            /* Sent subject of mail */
-            $subject = new \SendGrid\Mail\Subject($validated['emailTopic']);
-
-            /* Set mail body */
-            $htmlContent = new \SendGrid\Mail\HtmlContent($validated['emailBody']);
-
-            $email = new \SendGrid\Mail\Mail(
-                $from,
-                $key->email,
-                $subject,
-                null,
-                $htmlContent
-            );
-
-            return $response = $sendgrid->send($email);
-        }
-
-        // /* Sent subject of mail */
-        // $subject = new \SendGrid\Mail\Subject($validated['emailTopic']);
-
-        // /* Set mail body */
-        // $htmlContent = new \SendGrid\Mail\HtmlContent($validated['emailBody']);
-
-        // $email = new \SendGrid\Mail\Mail(
-        //     $from,
-        //     $receivers,
-        //     $subject,
-        //     null,
-        //     $htmlContent
-        // );
-
-        // /* Create instance of Sendgrid SDK */
-        // $sendgrid = new SendGrid(getenv('SENDGRID_API_KEY'));
-
-        /* Send mail using sendgrid instance */
-        // return $response = $sendgrid->send($email);
-        // if ($response->statusCode() == 202) {
-        //     return back()->with(['success' => "E-mails successfully sent out!!"]);
-        // }
-
-        // return back()->withErrors(json_decode($response->body())->errors);
     }
 
 }
