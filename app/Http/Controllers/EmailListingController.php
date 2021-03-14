@@ -8,6 +8,11 @@ use SendGrid;
 
 class EmailListingController extends Controller
 {
+    protected function array_push_assoc(&$array, $key, $value){
+        $array[$key] = $value;
+        return $array;
+    }
+
     public function sendEMail(Request $request)
     {
 
@@ -26,34 +31,8 @@ class EmailListingController extends Controller
         
 
         foreach($addresses as $address){
-            if(count($receivers) === 0){
-                $receivers = [$address->email => "this is the first"];
-            }else{
-                array_push($receivers, $address->email);
-            }
-            // $receivers[] = $receivers2;
-            // array_push($receivers, [$address->email=>"this is a test"]);
-            // $receivers = array($address->email=>"this is a test");
+            $this->array_push_assoc($receivers, $address->email, 'Example user ');
         }
-        // $sum = 0;
-        // do{
-        //     $sum ++;
-        //     array_push($receivers, [$addresses->email => "this is a test"]);
-        // }while ($sum < count($addresses));
-
-        print_r($receivers);
-        return $receivers;
-
-        // $tos = [
-        //         "alloyking1@gmail.com" => "Example User1",
-        //         "alloyking1@yahoo.com" => "Example User2",
-        //     ];
-
-        // return $receivers;
-        // return $tos;
-
-        
-            
 
         $email = new \SendGrid\Mail\Mail();
         $email->setFrom($from, "alloy");
