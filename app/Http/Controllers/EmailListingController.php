@@ -8,6 +8,9 @@ use SendGrid;
 
 class EmailListingController extends Controller
 {
+    /**
+     * 
+     */
     protected function array_push_assoc(&$array, $key, $value){
         $array[$key] = $value;
         return $array;
@@ -31,13 +34,12 @@ class EmailListingController extends Controller
         
 
         foreach($addresses as $address){
-            $this->array_push_assoc($receivers, $address->email, 'Example user ');
+            $this->array_push_assoc($receivers, $address->email, 'Example user '.$address->email);
         }
 
         $email = new \SendGrid\Mail\Mail();
-        $email->setFrom($from, "alloy");
+        $email->setFrom($from, "Kolorsplash");
         $email->setSubject($topic);
-        $email->addTo("alloyking1@gmail.com", "Example User");
         $email->addTos($receivers);
         $email->addContent("text/plain", $emailContent);
         
@@ -45,6 +47,10 @@ class EmailListingController extends Controller
 
         try {
             $response = $sendgrid->send($email);
+            $response = $sendgrid->send($email);
+            print $response->statusCode() . "\n";
+            print_r($response->headers());
+            print $response->body() . "\n";
             return response()->json("Email sent successfully");
 
         } catch (Exception $e) {
